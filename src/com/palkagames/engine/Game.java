@@ -2,6 +2,7 @@ package com.palkagames.engine;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferStrategy;
 
 /**
  * Created by Zver on 04.07.2016.
@@ -43,7 +44,7 @@ public class Game extends Canvas implements Runnable{
     //остановка основного потока
     public synchronized void stop(){
         //игровой цикл не может быть запущен
-        running = true;
+        running = false;
         //попытка завершить поток
         try {
             thread.join();
@@ -55,12 +56,41 @@ public class Game extends Canvas implements Runnable{
     //стартует при запуске потока
     @Override
     public void run() {
-        //инциализируем игру
-        new Game();
         //запускаем главный цикл
         while(running){
-            System.out.println("running...");
+            //обновляем игровые данные
+            update();
+            //отрисовываем игровые данные
+            render();
         }
+    }
+
+    //метод обновляющий игровое состояние(каждый кадр)
+    public void update(){
+
+    }
+
+    //метод отрисовывающий картинку на экран(каждый кадр)
+    public void render(){
+        //буфер отрисовки, фронт, бэк буфер и тд
+        BufferStrategy bs = getBufferStrategy();
+        if (bs == null){
+            //создаем три буфера отрисовки
+            createBufferStrategy(3);
+            return;
+        }
+
+        //контекст графики для отрисовки буферов
+        Graphics g = bs.getDrawGraphics();
+        //очищаем экран черным цветом
+        g.setColor(Color.BLACK);
+        //рисуем прямоугольник на весь экран
+        g.fillRect(0, 0, getWidth(), getHeight());
+        //освобождаем ресурсы
+        g.dispose();
+        //показываем следующий доступный буфер
+        bs.show();
+
     }
 
     //стартовый метод
