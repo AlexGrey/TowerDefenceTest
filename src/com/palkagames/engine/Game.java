@@ -91,7 +91,8 @@ public class Game extends Canvas implements Runnable{
             createBufferStrategy(3);
             return;
         }
-
+        //очищаем экран
+        screen.clear();
         //отрисовка игрового экрана
         screen.render();
         //заполняем буфер изображения, буфером экрана
