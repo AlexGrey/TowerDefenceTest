@@ -1,8 +1,12 @@
 package com.palkagames.engine;
 
+import com.palkagames.engine.graphics.Screen;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 
 /**
  * Created by Zver on 04.07.2016.
@@ -21,6 +25,12 @@ public class Game extends Canvas implements Runnable{
     private JFrame frame;
     //запущен игровой цикл или нет?
     private boolean running = false;
+    //основной игровой экран
+    private Screen screen;
+    //буффер изображения
+    private BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+    //растеризованный пиксельный буфер
+    private int[] pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
 
     //конструктор
     public Game(){
@@ -28,6 +38,8 @@ public class Game extends Canvas implements Runnable{
         Dimension size = new Dimension(width * scale, height * scale);
         //установка предпочитаемого разрешения
         setPreferredSize(size);
+        //инициализация основного экрана длиной и высотой
+        screen = new Screen(width, height);
         //инициализация контент панели
         frame = new JFrame();
     }
@@ -80,12 +92,17 @@ public class Game extends Canvas implements Runnable{
             return;
         }
 
+        //отрисовка игрового экрана
+        screen.render();
+        //заполняем буфер изображения, буфером экрана
+        for (int i = 0; i < pixels.length; i++) {
+            pixels[i] = screen.pixels[i];
+        }
+
         //контекст графики для отрисовки буферов
         Graphics g = bs.getDrawGraphics();
-        //очищаем экран черным цветом
-        g.setColor(Color.BLACK);
-        //рисуем прямоугольник на весь экран
-        g.fillRect(0, 0, getWidth(), getHeight());
+        //отрисовывает буфер изображения
+        g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
         //освобождаем ресурсы
         g.dispose();
         //показываем следующий доступный буфер
