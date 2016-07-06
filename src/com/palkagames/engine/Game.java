@@ -18,6 +18,8 @@ public class Game extends Canvas implements Runnable{
     public static final int height = width / 16 * 9;
     //масштабирование?
     public static final int scale = 3;
+    //заголовок игрового окна
+    public static String title = "Tower Defense";
 
     //основной игровой поток
     private Thread thread;
@@ -68,16 +70,55 @@ public class Game extends Canvas implements Runnable{
     //стартует при запуске потока
     @Override
     public void run() {
+
+        long lastTime = System.nanoTime();
+        //таймер для счета каждой секунды
+        long timer = System.currentTimeMillis();
+        //здесь задается, сколько раз игровой состояние обновляется в секунду(не рендер!)
+        final double ns = 1000000000.0 / 60.0;
+        //разница между прошлым и предыдущим обновлением игрового состояния
+        double delta = 0;
+        //количество кадров в секунду
+        int frames = 0;
+        //количество апдейтов в секунду
+        int updates = 0;
         //запускаем главный цикл
         while(running){
-            //обновляем игровые данные
-            update();
+            //текущее время
+            long now = System.nanoTime();
+            //разница между текущим, и последним обновлением
+            delta += (now - lastTime) / ns;
+            //последнее становится текщим
+            lastTime = now;
+            //пока разница больше единицы
+            while (delta >= 1){
+                //обновляем игровые данные 60 раз в секунду
+                update();
+                //увеличиваем счетчик апдейта
+                updates++;
+                //уменьшаем счетчик дельты
+                delta--;
+            }
             //отрисовываем игровые данные
             render();
+            //увеличиваем счетчик кадров в секунду
+            frames++;
+
+            //если прошла секунда
+            if (System.currentTimeMillis() - timer > 1000){
+                //увеличиваем таймер на 1000мс
+                timer += 1000;
+                //выводим данные на экран
+                frame.setTitle(Game.title + " | " + updates + " ups, " + frames + " fps");
+                //обнуляем данные, будут пересчитаны в следующем апдейте в течении секунды
+                updates = 0;
+                frames = 0;
+            }
         }
+        stop();
     }
 
-    //метод обновляющий игровое состояние(каждый кадр)
+    //метод обновляющий игровое состояние(60 раз в секунду)
     public void update(){
 
     }
@@ -118,7 +159,7 @@ public class Game extends Canvas implements Runnable{
         //запрещаем изменять размер экрана
         game.frame.setResizable(false);
         //установка заголовка
-        game.frame.setTitle("TowerDefence");
+        game.frame.setTitle(Game.title);
         //добавляем на контент панель нашу игру
         game.frame.add(game);
         //устанавливает такой минимальный размер, чтобы в окно влезли все компоненты
