@@ -34,6 +34,9 @@ public class Game extends Canvas implements Runnable{
     //растеризованный пиксельный буфер
     private int[] pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
 
+    private int xOffset = 0;
+    private int yOffset = 0;
+
     //конструктор
     public Game(){
         //установка размера экрана
@@ -120,7 +123,8 @@ public class Game extends Canvas implements Runnable{
 
     //метод обновляющий игровое состояние(60 раз в секунду)
     public void update(){
-
+        xOffset++;
+        yOffset++;
     }
 
     //метод отрисовывающий картинку на экран(каждый кадр)
@@ -135,7 +139,7 @@ public class Game extends Canvas implements Runnable{
         //очищаем экран
         screen.clear();
         //отрисовка игрового экрана
-        screen.render();
+        screen.render(xOffset, yOffset);
         //заполняем буфер изображения, буфером экрана
         for (int i = 0; i < pixels.length; i++) {
             pixels[i] = screen.pixels[i];

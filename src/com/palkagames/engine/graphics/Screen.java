@@ -1,5 +1,7 @@
 package com.palkagames.engine.graphics;
 
+import java.util.Random;
+
 /**
  * Created by Zver on 05.07.2016.
  */
@@ -8,12 +10,14 @@ public class Screen {
     private int width, height;
     //буфер пикселей экрана
     public int[] pixels;
-
-    //какие-то счетчики
-    private int counter = 0;
-    //счетчики предотвращения выхода за границы int
-    private int xTime = 20;
-    private int yTime = 20;
+    //размер карты
+    private final int MAP_SIZE = 8;
+    //размер битовой маски карты
+    private final int MAP_MASK = 7;
+    //буфер тайлов
+    public int[] tiles = new int[MAP_SIZE * MAP_SIZE];
+    //рандом
+    private Random random = new Random();
 
     public Screen(int width, int height) {
         //конструктор устанавливающий длину и высоту
@@ -21,6 +25,10 @@ public class Screen {
         this.height = height;
         //и массив пикселей
         pixels = new int[width * height];
+        //заполняем буфер тайлов рандомным цветом
+        for (int i = 0; i < MAP_SIZE * MAP_SIZE; i++) {
+            tiles[i] = random.nextInt(0xffffff);
+        }
     }
 
     //метод очистки экрана
@@ -32,23 +40,20 @@ public class Screen {
     }
 
     //метод отрисовки экрана
-    public void render(){
-        //манипуляции со счетчиками, в дальнейшем изменится
-        counter++;
-        if (counter % 100 == 0){
-            xTime--;
-        }
-        if (counter % 100 == 0){
-            yTime--;
-        }
+    public void render(int xOffset, int yOffset){
         // заполняем буфер пикселей сплошным цветом
-        for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            int yy = y + yOffset;
             //выходим из цикла если вышли за границы высоты
-            if (yTime < 0 || yTime >= height) break;
-            for (int y = 0; y < height; y++) {
+            //if (yy < 0 || yy >= height) break;
+            for (int x = 0; x < width; x++) {
+                int xx = x + xOffset;
                 //выходим из цикла если вышли за границы длины
-                if (xTime < 0 || xTime >= width) break;
-                pixels[xTime + xTime * width] = 0xff00ff;
+                //if (xx < 0 || xx >= width) break;
+                //один тайл на каждые 16 пикселей (не ясно зачем маска, и битовые сдвиги)
+                int tileIndex = ((xx >> 4) & MAP_MASK) + ((yy >> 4) & MAP_MASK) * MAP_SIZE;
+                //заполняем буфер пикселей тайлами
+                pixels[x + y * width] = tiles[tileIndex];
             }
         }
     }
