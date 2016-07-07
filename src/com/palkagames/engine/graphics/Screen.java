@@ -11,9 +11,9 @@ public class Screen {
     //буфер пикселей экрана
     public int[] pixels;
     //размер карты
-    private final int MAP_SIZE = 8;
+    private final int MAP_SIZE = 64;
     //размер битовой маски карты
-    private final int MAP_MASK = 7;
+    private final int MAP_MASK = MAP_SIZE - 1;
     //буфер тайлов
     public int[] tiles = new int[MAP_SIZE * MAP_SIZE];
     //рандом
@@ -53,7 +53,8 @@ public class Screen {
                 //один тайл на каждые 16 пикселей (не ясно зачем маска, и битовые сдвиги)
                 int tileIndex = ((xx >> 4) & MAP_MASK) + ((yy >> 4) & MAP_MASK) * MAP_SIZE;
                 //заполняем буфер пикселей тайлами
-                pixels[x + y * width] = tiles[tileIndex];
+                pixels[x + y * width] = Sprite.grass.pixels[(x&15) + (y&15) * Sprite.grass.SIZE];
+                //pixels[x + y * width] = tiles[tileIndex];
             }
         }
     }
