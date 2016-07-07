@@ -1,6 +1,7 @@
 package com.palkagames.engine;
 
 import com.palkagames.engine.graphics.Screen;
+import com.palkagames.engine.input.Keyboard;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,6 +26,8 @@ public class Game extends Canvas implements Runnable{
     private Thread thread;
     //контент панель
     private JFrame frame;
+    //клавиатура
+    private Keyboard key;
     //запущен игровой цикл или нет?
     private boolean running = false;
     //основной игровой экран
@@ -33,7 +36,7 @@ public class Game extends Canvas implements Runnable{
     private BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
     //растеризованный пиксельный буфер
     private int[] pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
-
+    //сдвиг по x и y
     private int xOffset = 0;
     private int yOffset = 0;
 
@@ -47,6 +50,9 @@ public class Game extends Canvas implements Runnable{
         screen = new Screen(width, height);
         //инициализация контент панели
         frame = new JFrame();
+        //инициализируем клавиатуру, и добавляем слушателя
+        key = new Keyboard();
+        frame.addKeyListener(key);
     }
 
     //старт основного потока
@@ -123,8 +129,13 @@ public class Game extends Canvas implements Runnable{
 
     //метод обновляющий игровое состояние(60 раз в секунду)
     public void update(){
-        xOffset++;
-        yOffset++;
+        //обновляем состояние нажатия клавиш
+        key.update();
+        //сдвигаем карту по х и y при нажатии на клавиши
+        if (key.up) yOffset--;
+        if (key.down) yOffset++;
+        if (key.left) xOffset--;
+        if (key.right) xOffset++;
     }
 
     //метод отрисовывающий картинку на экран(каждый кадр)
