@@ -45,22 +45,26 @@ public class Screen {
 
     //метод отрисовки экрана
     public void renderTile(int xp, int yp, Tile tile){
+        //вычитаем сдвиг по х и у
         xp -= xOffset;
         yp -= yOffset;
 
+        //проходим по тайлам и устанавливаем значение пикселей экрана в значение пикселей тайла
         for (int y = 0; y < tile.sprite.SIZE; y++) {
             int ya = y + yp;
             for (int x = 0; x < tile.sprite.SIZE; x++) {
                 int xa = x + xp;
-                if (xa < 0 || xa >= width || ya < 0 || ya >= width){
+                if (xa < -tile.sprite.SIZE || xa >= width || ya < 0 || ya >= height){
                     break;
                 }
+                if (xa < 0) xa = 0;
                 pixels[xa + ya * width] = tile.sprite.pixels[x + y * tile.sprite.SIZE];
             }
         }
     }
-
+    //установки сдвига по х и у
     public void setOffset(int xOffset, int yOffset){
+        //устнавливаем сдвиг по х и у
         this.xOffset = xOffset;
         this.yOffset = yOffset;
     }
