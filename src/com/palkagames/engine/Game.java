@@ -2,6 +2,8 @@ package com.palkagames.engine;
 
 import com.palkagames.engine.graphics.Screen;
 import com.palkagames.engine.input.Keyboard;
+import com.palkagames.engine.level.Level;
+import com.palkagames.engine.level.RandomLevel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,6 +30,7 @@ public class Game extends Canvas implements Runnable{
     private JFrame frame;
     //клавиатура
     private Keyboard key;
+    private Level level;
     //запущен игровой цикл или нет?
     private boolean running = false;
     //основной игровой экран
@@ -52,6 +55,7 @@ public class Game extends Canvas implements Runnable{
         frame = new JFrame();
         //инициализируем клавиатуру, и добавляем слушателя
         key = new Keyboard();
+        level = new RandomLevel(64, 64);
         frame.addKeyListener(key);
     }
 
@@ -92,6 +96,7 @@ public class Game extends Canvas implements Runnable{
         //количество апдейтов в секунду
         int updates = 0;
         //запускаем главный цикл
+        frame.requestFocus();
         while(running){
             //текущее время
             long now = System.nanoTime();
@@ -149,8 +154,8 @@ public class Game extends Canvas implements Runnable{
         }
         //очищаем экран
         screen.clear();
-        //отрисовка игрового экрана
-        screen.render(xOffset, yOffset);
+        //отрисовка игрового уровня
+        level.render(xOffset, yOffset, screen);
         //заполняем буфер изображения, буфером экрана
         for (int i = 0; i < pixels.length; i++) {
             pixels[i] = screen.pixels[i];

@@ -1,5 +1,7 @@
 package com.palkagames.engine.graphics;
 
+import com.palkagames.engine.level.tile.Tile;
+
 import java.util.Random;
 
 /**
@@ -7,13 +9,15 @@ import java.util.Random;
  */
 public class Screen {
     //длина и высота экрана
-    private int width, height;
+    public int width, height;
     //буфер пикселей экрана
     public int[] pixels;
     //размер карты
     private final int MAP_SIZE = 64;
     //размер битовой маски карты
     private final int MAP_MASK = MAP_SIZE - 1;
+
+    public int xOffset, yOffset;
     //буфер тайлов
     public int[] tiles = new int[MAP_SIZE * MAP_SIZE];
     //рандом
@@ -40,23 +44,25 @@ public class Screen {
     }
 
     //метод отрисовки экрана
-    public void render(int xOffset, int yOffset){
-        // заполняем буфер пикселей сплошным цветом
-        for (int y = 0; y < height; y++) {
-            int yy = y + yOffset;
-            //выходим из цикла если вышли за границы высоты
-            //if (yy < 0 || yy >= height) break;
-            for (int x = 0; x < width; x++) {
-                int xx = x + xOffset;
-                //выходим из цикла если вышли за границы длины
-                //if (xx < 0 || xx >= width) break;
-                //один тайл на каждые 16 пикселей (не ясно зачем маска, и битовые сдвиги)
-                int tileIndex = ((xx >> 4) & MAP_MASK) + ((yy >> 4) & MAP_MASK) * MAP_SIZE;
-                //заполняем буфер пикселей тайлами
-                pixels[x + y * width] = Sprite.grass.pixels[(x&15) + (y&15) * Sprite.grass.SIZE];
-                //pixels[x + y * width] = tiles[tileIndex];
+    public void renderTile(int xp, int yp, Tile tile){
+        xp -= xOffset;
+        yp -= yOffset;
+
+        for (int y = 0; y < tile.sprite.SIZE; y++) {
+            int ya = y + yp;
+            for (int x = 0; x < tile.sprite.SIZE; x++) {
+                int xa = x + xp;
+                if (xa < 0 || xa >= width || ya < 0 || ya >= width){
+                    break;
+                }
+                pixels[xa + ya * width] = tile.sprite.pixels[x + y * tile.sprite.SIZE];
             }
         }
+    }
+
+    public void setOffset(int xOffset, int yOffset){
+        this.xOffset = xOffset;
+        this.yOffset = yOffset;
     }
 
 }
